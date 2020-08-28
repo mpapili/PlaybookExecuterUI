@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Card, CardTitle, CardText, CardBlock, CardFooter} from 'react-bootstrap-card';
 
 
+// Form detailing a step in a workflow
 class StepForm extends React.Component {
 
     constructor(props) {
@@ -18,17 +19,22 @@ class StepForm extends React.Component {
             this.setState(change)
         }
         this.handleSubmit = (e) => {
-            console.log("a form was submitted")
-            console.log("form state is currently ", this.state)
+            console.log(e)
             event.preventDefault();
             this.props.addCard(this.state); // send it back up!
             this.setState({Disabled: true}) // lock it up
+        }
+        this.finishClicked = () => {
+            console.log("finish was clicked!")
+            this.props.addCard(this.state);  // add our final card
+            /* now we'll want to somehow trigger the WorkflowCards component to send
+               all of its card info back up to the PlaybookMaker component */
+            this.props.finished();
         }
     }
     
 
     render(props) {
-        console.log(this.props.addCard);
         return (
             <form onSubmit={this.handleSubmit}>
 
@@ -48,16 +54,17 @@ class StepForm extends React.Component {
                 </label>
 
                 <input type="submit" value="Add Another Step" disabled={this.state.Disabled}/>
+                <input type="button" value="Finish" onClick={this.finishClicked} disabled={this.state.Disabled}/>
 
             </form>
         )
     }
 }
 
+// Card object containing the form for creating a Step
 class StepCard extends React.Component {
 
     render(props) {
-        console.log(this.props)
         return (
             <Card style={{ width: '18rem', margin: '25px'}}>
 
@@ -65,34 +72,41 @@ class StepCard extends React.Component {
                     <CardTitle>
                         Step {this.props.num}
                     </CardTitle>
-                    <StepForm addCard={this.props.addCard}/>
+                    <StepForm addCard={this.props.addCard} finished={this.props.finished}/>
                 </CardBlock>
+
             </Card>
         );
     }
 }
 
 
+// Contains all Steps/Cards
 class WorkflowCards extends React.Component {
     state = { elements: [] }
     
     formSubmit = (formData) => {
-        console.log("running addcard!");
-        console.log(formData)
         let newElems = [...this.state.elements, formData]
         this.setState({elements: newElems})
-        console.log("elements are now", this.state.elements)
     }
+    
+    finishSteps = () => {
+        console.log("All Steps are now finished!")
+        /* Last card will have been added at this time; need to now get "elements" (rename?) 
+           back up to the state of the PlaybookMaker component */
+    }
+    
     render() {
         
         return (
             <div style={{display: 'flex', flexDirection: 'row', flexFlow: 'wrap', width: '400%'}}>
+
               {/* First Card */}
-              <StepCard key={-1} num={1} addCard={this.formSubmit}> </StepCard>
+              <StepCard key={-1} num={1} addCard={this.formSubmit} finished={this.finishSteps}> </StepCard>
             
-              {/* Card for Added Steps */}
+              {/* Cards for Added Steps */}
               {this.state.elements.map((v, i) => {
-                   return <StepCard key={i} num={i + 2} addCard={this.formSubmit}> </StepCard>  
+                   return <StepCard key={i} num={i + 2} addCard={this.formSubmit} finished={this.finishSteps}> </StepCard>
               })}
 
             </div>
@@ -102,4 +116,3 @@ class WorkflowCards extends React.Component {
 
 
 export {WorkflowCards};
-export {StepCard};
