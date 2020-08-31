@@ -7,8 +7,10 @@ import styled from 'styled-components';const GridWrapper = styled.div`
   margin-right: 6em;
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: minmax(25px, auto);`;
+
 import {WorkflowCards} from './WorkflowCards.js';
 import {WorkflowMeta} from './WorkflowMeta.js';
+import {TestRest, AddPlaybook} from './ApiHandler.js';
 
 
 class PlaybookMaker extends React.Component {
@@ -32,6 +34,18 @@ class PlaybookMaker extends React.Component {
         console.log("this.state is now", this.state)
     }
     
+    submitCards = async (stepData) => {
+        await this.setState({Steps: stepData})
+        console.log("from the playbook maker, state is ", this.state)
+        
+        // Currently just testing hitting an API
+        let resp = await TestRest();
+        console.log('hit api, response was ', resp.data.msg)
+        
+        // Try doing some POST data now:
+        let postResp = await AddPlaybook(this.state);
+    }
+    
     render = () => {
         return (
             <div>
@@ -45,7 +59,7 @@ class PlaybookMaker extends React.Component {
             
                 {/*Steps Cards*/}
                 { this.state.ShowStepCards
-                    ? <GridWrapper><WorkflowCards/></GridWrapper>
+                    ? <GridWrapper><WorkflowCards submitCards={this.submitCards}/></GridWrapper>
                     : null
                 }
 

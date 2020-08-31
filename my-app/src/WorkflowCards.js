@@ -90,10 +90,12 @@ class WorkflowCards extends React.Component {
         this.setState({elements: newElems})
     }
     
-    finishSteps = () => {
-        console.log("All Steps are now finished!")
+    finishSteps = async () => {
+        await console.log("All Steps are now finished!")
         /* Last card will have been added at this time; need to now get "elements" (rename?) 
            back up to the state of the PlaybookMaker component */
+        console.log(this.state.elements);
+        this.props.submitCards(this.state.elements); // send up to parent!
     }
     
     render() {
